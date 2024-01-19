@@ -1,6 +1,7 @@
 --Variables
 Inmission = false
 local robberyenable = false
+local hasPick = false
 
 
 ----- Registering Command To enable and disable robberies ----
@@ -128,7 +129,11 @@ AddEventHandler('bcc-robbery:LootHandler', function(e)
         if dist < 6 then
             BccUtils.Misc.DrawText3D(e.LootCoordinates.x, e.LootCoordinates.y, e.LootCoordinates.z, Config.Language.Robbery)
         end
-        if dist < 2 then
+        --hasPick = false
+        TriggerServerEvent('bcc-robbery:PickCheck')
+        --Wait(1000)
+        --print(hasPick)
+        if dist < 2 and hasPick then
             PromptGroup:ShowGroup(Config.Language.Robbery)
             if firstprompt:HasCompleted() then
 
@@ -139,12 +144,22 @@ AddEventHandler('bcc-robbery:LootHandler', function(e)
                         end
                         TriggerServerEvent('bcc-robbery:ItemsPayout', e)
                         Inmission = false
+                        TriggerServerEvent('bcc-robbery:removePick')
                     else
                         VORPcore.NotifyRightTip(Config.Language.PickFailed, 4000)
                         Inmission = false
+                        TriggerServerEvent('bcc-robbery:removePick')
                     end
                 end) break
             end
         end
     end
+end)
+
+RegisterNetEvent("bcc-robbery:yesPick", function()
+    hasPick = true
+end)
+
+RegisterNetEvent("bcc-robbery:noPick", function()
+    hasPick = false
 end)
